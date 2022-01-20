@@ -172,14 +172,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	// load image registry secrets
+	// intialize registry credentials
 	secrets := strings.Split(imagePullSecrets, ",")
-	if imagePullSecrets != "" && len(secrets) > 0 {
-		setupLog.Info("initializing registry credentials", "secrets", secrets)
-		if err := cosign.Initialize(kubeClient, config.KyvernoNamespace, "", secrets); err != nil {
-			setupLog.Error(err, "failed to initialize image pull secrets")
-			os.Exit(1)
-		}
+	setupLog.Info("initializing registry credentials", "secrets", secrets)
+	if err := cosign.Initialize(kubeClient, config.KyvernoNamespace, config.KyvernoServiceAccountName, secrets); err != nil {
+		setupLog.Error(err, "failed to initialize registry credentials")
+		os.Exit(1)
 	}
 
 	if imageSignatureRepository != "" {
